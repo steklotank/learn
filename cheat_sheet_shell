@@ -1,0 +1,26 @@
+ctrl+r reverse search in history
+
+copy ssh key to remote host with specific user
+ssh-copy-id -i ~/.ssh/id_rsa.pub 'user@domain'@10.0.1.1
+
+find directory in current
+ find . -type d -name "foo_bar"
+find files in root
+ find / -type f -name "foo_bar"
+ 
+find inside files
+zgrep -i 'bla_bla' /var/logs/*
+grep -rnw '/var/logs/' -e '27e6380d5'
+
+
+find and delete lot of file wtih mask
+find /var/logs -name "*2022-08*" -delete
+
+git hard reset to commit
+find hash of commit
+git history 
+git reset --hard <commit_hash>
+
+
+get md5 hash of pass
+ echo "p@ssword" | md5sum | cut -d' ' -f1
