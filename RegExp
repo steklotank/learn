@@ -1,0 +1,62 @@
+.  - any character
+
+c.t - match cat and cut
+
+\ - shielding sign 
+
+\.txt   match all .txt files
+
+[abc] - any character inside
+
+c[au]t - match cut and cat
+
+[a-zA-z0-9] - match any character abcde....ABCDEF...01234...
+[A-z] -do not use! match any ASCII Key
+
+^ - not sign 
+
+c[au]t[^0-9] - match cat and cut but not cat1 or cut0
+
+
+more special symol combinations
+
+[\b] - backspace
+\f - Form feed
+\n - Line feed
+\r - Carriage return
+\t - tab
+\v - vertical tab
+\r\n  - EOL sign Windows
+
+\d - any digits = [0-9]
+\D - any non digits = [^0-9]
+
+\w - any alphanumeric character upper lower case and underscore = [a-zA-Z0-9_]
+\W - any non alphanumeric char [^a-zA-Z0-9]
+
+\s - any witspace char = [\f\n\r\t\v]
+\S - any non witspace char = [^\f\n\r\t\v]
+
++  is many symols 
+
+\w+@\w+.\w+  - this match any correct email  admin@example.com
+! - if use [0-9] shoul use [0-9]+    [0-9+] -- wrong
+
+to use admin@example.site.com we need to use   [\w.]   \w - do not cover the "."
+
+[\w.]+@[\w.]+\.\w.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
