@@ -90,6 +90,28 @@ but not
 1003: $26.43
 
 
+Greedy and Lazy Quantifiers
+Greedy Lazy
+*      *?
++      +?
+{n,} {n,}?
+*? is the lazy version of *, so let’s revisit our example, this time using *?
+
+Text
+This offer is not available to customers
+living in <b>AK</b> and <b>HI</b>.
+
+RegEx
+<[Bb]>.*<\/[Bb]>
+
+Result
+<b>AK</b> and <b>HI</b>.
+
+RegEx
+<[Bb]>.*?<\/[Bb]>
+give 2 differemt matches
+<b>AK</b>    <b>HI</b>.
+
 
 
 
