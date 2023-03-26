@@ -47,7 +47,47 @@ to use admin@example.site.com we need to use   [\w.]   \w - do not cover the "."
 [\w.]+@[\w.]+\.\w.
 
 
+https?:\/\/[\w.\/]+ match 
 
+The URL is http://www.forta.com/, to connect
+securely use https://www.forta.com/ instead.
+
+https?:// matches both http:// and https:// (but nothing else).
+
+
+#[A-Fa-f0-9]{6} matchs color
+
+body {
+ background-color: #fefbd8;
+}
+h1 {
+ background-color: #0000ff
+ 
+ 
+
+
+Intervals may also be used to specify a range of values—a minimum and a maximum
+number of instances that are to be matched. Ranges are specified as {2,4} (which would
+mean a minimum of 2 and a maximum of 4
+
+pattern \d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}
+
+matchs
+4/8/17
+10-6-2018
+01-01-01
+
+
+ {3,} means match at least three instances, 
+ 
+ for example \d+: \$\d{3,}\.\d{2}
+matchs
+1001: $496.80
+1002: $1290.69
+1004: $613.42
+
+but not 
+1003: $26.43
 
 
 
