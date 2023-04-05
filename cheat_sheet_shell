@@ -12,6 +12,8 @@ find inside files
 zgrep -i 'bla_bla' /var/logs/*
 grep -rnw '/var/logs/' -e '27e6380d5'
 
+grep all link strings
+ grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*"
 
 #find and delete lot of file wtih mask
 find /var/logs -name "*2022-08*" -delete 
