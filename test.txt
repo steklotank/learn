@@ -2,5 +2,3 @@ hello
 
 hello new string§
 
-and another string
-
