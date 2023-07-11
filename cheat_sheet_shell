@@ -34,3 +34,7 @@ lscpu nproc
 
 show file openned by proccess
 lsof -p <PID>
+
+
+list all avalible repositories in bit bucket
+ curl -k --user <username>:<password> -X GET https://bitbucket.repo.com/rest/api/1.0/projects/PROJ_NAM/repos?limit=100 | grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*.git"
