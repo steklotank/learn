@@ -1,46 +1,138 @@
-
+##HOST Manipulating##
 rename host
 hostnamectl set-hostname NAME
 
+
+##DOC Manipulatig##
 apropos - for search in all man pages
 apropos -s  1,8 director for search only in 1 and 8 sections
-
 sudo mandb - for upgrade apropos
-
 mandb - for refresh apropos
-
-ctrl+r reverse search in history
-
 man man (use number of section for particulary page)
 
+##SSH manipulating##
 copy ssh key to remote host with specific user
 ssh-copy-id -i ~/.ssh/id_rsa.pub 'user@domain'@10.0.1.1
 
-find directory in current
+
+## File manipulating##
+Copy with permissions
+cp -p test.txt ./test_copy.txt
+create directory with parent directory 
+mkdir -p /tmp/1/2/3/4/5/6/7/8/9
+show ls with full time 
+ls --full-time
+#cat EOF
+HOW TO EOF in example.txt
+ cat  <<EOF >example.txt
+> abracadabrA
+> EOF
+
+
+## Permissions manipulating ##
+#Change group permisson to file
+chgrp wheel exapmle.txt 
+#Change file user permission
+sudo chown sk example.txt
+#change with group
+sudo chown sk:wheel example.txt
+#Order for all permission
+first check User > Groups > Other
+!if user doest have rights to manage file
+but hes group does, he will refused,
+because users right does not applyble 
+#Chmod base
+chmod  ugo(user\group other) +-(add or remove permission) rwx(read write execute) filname
+or
+chomd u=rwx filname
+or
+chmod 777(ugo) filname
+1 - execute
+2 - write
+4 - read
+7 = 1+4+2 read write execute
+5 = 4+1 read and execute
+6 = 4+2 read and write
+3? = execute+write (not read!)
+how theese numbers calculated
+r--|-w-|--x
+100|010|001 biary>decimal 421
+
+0644 - 0 special bit equals 1,2 or 4
+stickyBit (+t) - 1 запрещает пользователям удалять файлы других пользователей
+SGID -(g+s) 2  для файла разрешает выполнять файл с разрешениями группы. 
+для группы файлы созданные в каталоге получают одного и того же владельца группы
+SUID - (u+s) -4 Пользователь выполняет файл с разрешением владельца файла
+
+## File searching with find ##
+#find directory in current directory
  find . -type d -name "foo_bar"
-find files in root
+#find files in root folder
  find / -type f -name "foo_bar"
- 
-find inside files
+#find case isensetive 
+find / -iname "foobar"
+#find inside files
 zgrep -i 'bla_bla' /var/logs/*
 grep -rnw '/var/logs/' -e '27e6380d5'
-
-grep all link strings
+#grep all link strings
  grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*"
-
-#find and delete lot of file wtih mask
+#find all files specific size
+find /lib64/ -size +10M
+10c = 10bytes\ 10k=10Kbytes\ 10M= 10Mb\ 10G = 10Gb
+-size 512k -search exact 512Kb
+-size +512k -searchs all grader than 512K
+-size -512k - search all less 512k
+#find operators
+And operator
+find -size 10M -name "f*" # finds files size 10M and name starts with f
+Or operator 
+find -size 10M -o -name "f*" fins 10M size or name starts with f
+Not operator
+find -not -name "f*" #or find \! -name "f*"
+#find and delete lot of file with mask
 find /var/logs -name "*2022-08*" -delete 
+#find all files wich modified 1 min ago
+find /dev/ -mmin -5
+mmin 5 = modied just 5 minues ago
+mmin -5 = modified all before 5 miutes ago
+mmin +5 = 5+ -5 5 min ago + all during 5 min
 #find and delete files older than 5 days ago
 find . -mtime +5 -delete
+mitme 2 - 2 days ago
+#!!!modified - change content != changed changed metadate (file permission)
+find / -cmin -5 change 5 min ago
+#find with permisson
+find -perm 664  # find exact 664 permission not 777 or 544
+find -perm -644 # finds at least 644 permission includes 777
+find -perm /644 # finds files with any permission it finds 777 and 544
+find -perm u=rwx, g=rw, o=r
+find . -perm -444 -perm /222 ! -perm /111
+find . -perm -a+r -perm /a+w ! -perm /a+x
+#example find any file group can write and others cannot read or write
+sudo find /var/log/ -perm /g+w ! -perm /o+rw
+#Find our secret file under /home/bob. You can either look for a file that is exactly 213 kilobytes or a file that has permission 402 in octal
+find -size 213k -o -perm 402
+#find and exec
+find in local dir and copy to another
+find /home/bob/ -name "cats.txt" -exec cp "{}" /opt  \;
 
-git hard reset to commit
-find hash of commit
+
+##Command line manipulating##
+ctrl+r reverse search in history
+
+## GIT Manipulating ##
+#git hard reset to commit, find hash of commit
 git history 
+#reset to comit
 git reset --hard <commit_hash>
+#list all avalible repositories in bit bucket
+ curl -k --user <username>:<password> -X GET https://bitbucket.repo.com/rest/api/1.0/projects/PROJ_NAM/repos?limit=100 | grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*.git"
 
 
-get md5 hash of pass
- echo "p@ssword" | md5sum | cut -d' ' -f1
+
+##Debugging tools##
+top htop - for proccessing info
+itop - for disk usage
 
 show cpu
 lscpu nproc
@@ -48,6 +140,14 @@ lscpu nproc
 show file openned by proccess
 lsof -p <PID>
 
+strace <command> - tracing syscall etc.
 
-list all avalible repositories in bit bucket
- curl -k --user <username>:<password> -X GET https://bitbucket.repo.com/rest/api/1.0/projects/PROJ_NAM/repos?limit=100 | grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*.git"
+
+------------------------------------------------------------
+
+
+## Text manipulating##
+get md5 hash of pass
+ echo "p@ssword" | md5sum | cut -d' ' -f1
+
+    
