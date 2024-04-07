@@ -1,4 +1,17 @@
+
+rename host
+hostnamectl set-hostname NAME
+
+apropos - for search in all man pages
+apropos -s  1,8 director for search only in 1 and 8 sections
+
+sudo mandb - for upgrade apropos
+
+mandb - for refresh apropos
+
 ctrl+r reverse search in history
+
+man man (use number of section for particulary page)
 
 copy ssh key to remote host with specific user
 ssh-copy-id -i ~/.ssh/id_rsa.pub 'user@domain'@10.0.1.1
