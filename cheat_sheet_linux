@@ -119,6 +119,7 @@ find /home/bob/ -name "cats.txt" -exec cp "{}" /opt  \;
 
 ##Command line manipulating##
 ctrl+r reverse search in history
+watch -n 5 date -run date every 5 seconds
 
 ## GIT Manipulating ##
 #git hard reset to commit, find hash of commit
@@ -150,4 +151,32 @@ strace <command> - tracing syscall etc.
 get md5 hash of pass
  echo "p@ssword" | md5sum | cut -d' ' -f1
 
-    
+tail -n 20 #show last 20 strings
+tail -f follow 
+head #opposit of taitl
+
+wc - word count
+wc -w -count lines
+
+#sed
+sed 's/canda/canada/g' user_info.txt #this will find all canda and replace to canada in dry-run
+    s-substitute 
+    g-global (withowt it will just replace first)
+sed -i 's/canda/canada/g' user_info.txt # -i means directly in file
+
+
+cut -d ' ' -f 1 user_info.txt  # -d is for delimeter ' '-delimeter -f 1 - first 1 column
+
+# slect only uniqe strings in next line
+uniq filname.txt 
+
+#sorting 
+sort filename.txt
+
+#for select only uniqe enteries we need to pass 
+sort filname.txt | qniq
+
+
+diff -c file1 file2 # for show diff with context
+
+sdiff file1 file2 # for side by side diff
