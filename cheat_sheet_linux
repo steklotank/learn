@@ -128,6 +128,9 @@ git history
 git reset --hard <commit_hash>
 #list all avalible repositories in bit bucket
  curl -k --user <username>:<password> -X GET https://bitbucket.repo.com/rest/api/1.0/projects/PROJ_NAM/repos?limit=100 | grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*.git"
+#Get changes from master into your branch
+git checkout my_feature_branch
+git rebase master
 
 
 
@@ -164,8 +167,54 @@ sed 's/canda/canada/g' user_info.txt #this will find all canda and replace to ca
     g-global (withowt it will just replace first)
 sed -i 's/canda/canada/g' user_info.txt # -i means directly in file
 
+I - capital I for case isensetive. On the end like /Ig
+
+sed -i '500,2000s/enabled/disabled/g' values.conf
 
 cut -d ' ' -f 1 user_info.txt  # -d is for delimeter ' '-delimeter -f 1 - first 1 column
+
+#vi
+search case isensetive /search\c
+:5 - goes to 5th line 
+yy -for copy p for past
+
+#grep
+ grep key 'pattern' /path/to/file
+ -r - recusevly
+ -i - case insensetive
+ -vi - invert match
+ -w -for words
+ -o - only match 
+
+#regexp
+- ^ search in begin of words
+- $ search for the end of word
+  . match any character
+  \. search only period 
+ * - any character any times
+ /.*/ -finds all words in bracets
+ 0* - fins all character even without "0"
+ 0+ - fnds all zeros
+ {min,max}
+ 0{3,} - shows all strings above 000 so 000 and 00000
+ 0{,3} - shows at most 3 zeros 00 or zero 
+ 0{3} - exact 000
+ ? - for elamens that may occured
+ disabled? - shows disable disabled and disables
+ | -for or
+ enabled|disabled - show all enabled and disabled words
+ []-rage
+ [a-z] from a to z
+ c[au]t -for find cat and cut
+() - subexpression
+[^] - exclude from search 
+http[^s] - will show only http
+regexr.com
+egrep -w '[A-Z][a-z]{2}' /etc/nsswitch.conf > /home/bob/filtered1
+grep -ic '^SECTION' testfile > /home/bob/count_lines
+ force grep to use regular re expression grep -Er
+ or use egrep 
+
 
 # slect only uniqe strings in next line
 uniq filname.txt 
