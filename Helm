@@ -1,0 +1,79 @@
+bascis 
+helm -- kubernetes "packet manager"
+for install
+$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+$ chmod 700 get_helm.sh
+$ ./get_helm.sh
+
+Helm2 need Tiller  api version 1
+Helm3 works nativly api version 2
+
+#Helm have repository of helmcharts to manage repo use 
+helm repo help
+helm repo update help
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+#for search chart use 
+helm search hub wordpress
+
+# release manage
+helm install my-site bitnami/wordpress
+helm install my-SECOND-site bitnami/wordpress
+helm list
+helm uninstall my release
+
+#customizing inline 
+helm install my-release --set wordpressBlogName="Hello, world" bitnami/wordpress
+
+helm install my-release --values custom_values.yaml bitnami/wordpress
+
+helm pull untar bitnami/wordpress
+
+# Lifecycle 
+helm install my-site bitnami/wordpress
+helm upgrade dazzling-web bitnami/nginx --version 13
+helm list  #list release 
+helm history #shows more history
+helm rollback my-site 1
+
+#HELMCHARTS
+#to create own helmchart type
+helm create chart_name
+# it will create simple  chart structure with tree
+# Chart.yaml contain
+
+#templating
+Predefined values
+Release.Name
+Release.Namespace
+Release.IsUpgrade
+Release.IsInstall
+Release.Revision
+Release.Service
+Chart.Name
+Chart.ApiVersion
+Chart.Version
+Chart.Type
+Chart.Keywords
+Chart.Home
+Capabilities.KubeVersion
+Capabilities.ApiVersions
+Capabilities.HelmVersion
+Capabilities.GitCommit
+Capabilities.GitTreeState
+Capabilities.GoVersion
+
+custom values 
+Values.replicaCount
+Values.image
+etc
+
+# verifying 
+helm lint ./chart_name #hilights the errors
+
+# display chart 
+helm template your_release_name ./chart_name
+# if there is probplem while templating run with --debug flag
+#dry-run
+helm install your_release ./chart_name --dry-run
+
