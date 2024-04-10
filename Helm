@@ -77,3 +77,13 @@ helm template your_release_name ./chart_name
 #dry-run
 helm install your_release ./chart_name --dry-run
 
+# Functions
+{{ .Values.image.name }} -simple template value
+{{ upper .Values.image.name }} - turn to uppercase
+{{ repeat 5 .Values.image.name}} -repeat value 5 times
+{{ quote .Values.image.name }} - will quote image name
+most use case with pipe
+{{ .Values.image.name | default "nginx" | quote }} -if there is no image helm put nginx an make it quoted
+full list of funcs
+https://helm.sh/docs/chart_template_guide/functions_and_pipelines/
+https://helm.sh/docs/chart_template_guide/function_list/
