@@ -87,3 +87,137 @@ most use case with pipe
 full list of funcs
 https://helm.sh/docs/chart_template_guide/functions_and_pipelines/
 https://helm.sh/docs/chart_template_guide/function_list/
+
+#Conditions
+{{ if .Values.some_feature.enabled }}
+   lable: {{ .Values.some_feature.value }}
+{{ else if eq .Values.some_feature "None"}}
+    lable: default
+{{ end }}
+
+{{- if ..}} - this construct will remove spaces in resulting manifest
+{{- end}}
+
+
+#with
+{{- with .Values.app }}
+backgound: {{.ui.bg}}   # instead .Values.app.ui.bg
+foregorund: {{.ui.fg}}
+{{- with .database}}
+user: {{.user}}
+password: {{.pass}}
+#Also we can reffer to Release but with Global ident $.Release.Name
+{{- end }}
+{{- end }}
+
+#Aslo with with we can use in like enabler
+in this case we have create var that controls  applying service 
+
+{{- with .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $.Values.serviceAccount.name }}
+  labels:
+    app: webapp-color
+{{- end }}
+
+
+
+#Range
+For example we have countreis
+
+values.yaml
+```
+countries:
+    - Russia
+    - Finland
+    - Sweeden
+```
+
+And we need to pass it to manifest
+
+data:
+    countreis:
+    {{- range .Values.countries }}
+     - {{.| quote }}
+    {{- end }}
+
+# Advanced range with key: value
+{{- with .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $.Values.serviceAccount.name }}
+  labels:
+    {{- range $key, $val := $.Values.serviceAccount.labels }}
+    {{ $key }}: {{ $val }}
+    {{- end }}
+    app: webapp-color
+{{- end }}
+
+#Using helpers 
+
+_helper.tpl
+it have sections 
+For example labels:
+
+{{/*
+Common labels
+*/}}
+{{- define "calico.labels" -}}
+helm.sh/chart: {{ include "calico.chart" . }}
+{{ include "calico.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+In chart we can past this by reffer to template
+
+metadata:
+  name: calico-node-secret-reader
+  labels: {{- include "calico.labels" . | nindent 4 }}
+rules:
+
+#Breakdown
+include
+# we use include instead template for correct idents
+
+"calico.labels" .  
+# we need to use period (.) for reffering to data.
+# If we don't need to use Chart.AppVersion we skip
+
+ nindent 4
+# by default template past without additional ident. We fix it
+
+
+#Hooks
+#typical upgrade path 
+#helm comand(delete,update,install) > verify > render > pre-comand comand post-command
+# so we will have pre delete and pust delete web hooks.
+#How to use it?
+# Backup
+we need to add to add to backup job an annotaations
+
+annotations:
+    "helm.sh/hook": pre-upgrade
+
+#for order multiple hooks we need add weight
+annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "5"   # order from -5 -4 ...0 1 2 to 5
+#for delete or keep hooked object use
+    "helm.sh/hook-delete-policy" hook-succeeded
+     # succeeded - delete weebhook after succeed applies
+     # failed - delete webhook even if it failed
+     # before-hook-creation - default value. Keep first hook and. delete previous hook if new present
+
+# packaging
+helm package ./chart_path
+
+#also we can --sign the chart
+
+# uploading
+copy tgz to new dir and run helm repo index filedir/ --url https://my_repo/charts
