@@ -221,8 +221,9 @@ list archve
 tar --list --file archive.tar
 tart -tf archve.tar
 #create
-tar --create --file archive.tar file1(/Dir_1)= tar cf archive.tar file1
+tar --create --file archive.tar file1= tar cf archive.tar file1
 tar --append --file archive.tar file2 = tar rf archive.tar file2
+create from dir sudo tar cfP logs.tar /var/log/
 #extract
 tar --extract --file arch.tar = tar xf arch.tar
 tar --extract --file arch.tar --directory /tmp/ = tar xf acrh -C /tmp/
@@ -272,6 +273,57 @@ sort <<EOF  - inline stream
 # EOF
 
 bc <<<1+2+3+4   -for pass an inline string
+
+column -t - for add  tabulation and purify outputs
+sort -duf -sort with case insensetive and clean from dupplicates
+
+#issue a certificate
+openssl req -x509 -newkey rsa:2048 -days 365 -keyout myprivate.key -out mycert.crt
+# view cert
+openssl x509 -in mycert.crt -text
+
+#force restart reboot
+systemctl reboot --force --force - instant reboot
+systemctl poweroff --force --force -instant power off
+
+shutdown 2:00 - in a AM
+shutdown +15 - shutdown after 15 min
+shutdown -r - for reboot
+#wall message
+shudtown -r +15 'Sheduled restart after 15 minuets'
+cancel shutdown
+shutdown -c 
+
+#Booting 
+systemctl get-default
+#change target for non graphical
+sudo systemctl get-default multi-user.target  
+# for backing graphical
+sudo systemctl isolate graphical.target
+# emergency
+sudo systemctl isolate emergency.target
+# rootshell
+sudo systemctl isolate rescue.target
+
+#Bootloader issue
+1)Load liveCD GRUB/
+2) procceed with /mnt/sysroot
+then chroot /mnt/susroot
+
+grub2-mkconfig - o /boot/grub2/grub.cfg
+
+lsblk
+find root mounted device
+
+grub2-install /dev/sda
+
+grub2-install /dev/vda > /home/bob/grub.txt 2>&1
+dnf reinstall grub2-efi grub-efi-modules shim
+
+#default grub config
+/etc/default/grub 
+
+
 
 
 
