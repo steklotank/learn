@@ -43,6 +43,7 @@ but hes group does, he will refused,
 because users right does not applyble 
 #Chmod base
 chmod  ugo(user\group other) +-(add or remove permission) rwx(read write execute) filname
+sudo chmod u+x,go-rwx
 or
 chomd u=rwx filname
 or
@@ -76,6 +77,8 @@ zgrep -i 'bla_bla' /var/logs/*
 grep -rnw '/var/logs/' -e '27e6380d5'
 #grep all link strings
  grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*"
+ #recurcevly grep
+ sudo grep -r "reboot" /var/log
 #find all files specific size
 find /lib64/ -size +10M
 10c = 10bytes\ 10k=10Kbytes\ 10M= 10Mb\ 10G = 10Gb
@@ -240,7 +243,7 @@ tar --create -gzip --file .. = tar czf ..
 tar --create -bzip2 --file .. = tar cjf ..
 tar --create -xz --file .. = tar cJf ..
 tar --create --autocompress --file tarname_with_ext.gz/bz2/xz = tar caf ..
-
+tar caf archive.tar.gz dir1
 For extract
 tar --extract --file .. = tar xf archive.tar.gz /folder
 
@@ -323,8 +326,156 @@ dnf reinstall grub2-efi grub-efi-modules shim
 #default grub config
 /etc/default/grub 
 
+#Starting up linux
+main proccess is init
+we have differen units such as services sockets devices and timers
+for example  systemctl cat containerd.service
+or  systemctl list-units and chose
+
+Example of sshd service
+[Unit]
+Description=OpenBSD Secure Shell server
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service
+
+#for managing use 
+sudo systemctl edit --full sshd.service
+
+sudo systemctl revert sshd.servic
+
+#managing service
+sudo systemctl status sshd.service
+sudo systemctl start sshd.service
+sudo systemctl stop sshd.service
+sudo systemctl restart  sshd.service
+sudo systemctl reload sshd.service
+
+#enabling\disabling services
+sudo systemctl disable sshd.service
+sudo systemctl disable --now sshd.service
+sudo systemctl enable sshd.service
+sudo systemctl enable --now sshd.service # for enable and start
+
+sudo systemctl mask sshd.service - it will never started by another program
+sudo systemctl unmask sshd.service
+
+sudo systemctl mask httpd.service
+
+#check service is enabled
+systemctl is-enabled sshd.service
 
 
+list all avalable services
+systemctl list-units --type service --all
+
+#Create services
+we cat use as template sshd
+sudo cp /lib/systemd/system/ssh.service  /etc/systemd/system/myapp.service
+base line to fill
+[Unit]
+Desc\ After\
+[Service] #livecycle of app
+ExecStart #binary for run
+ExecReload
+Restart\RestartSec
+KillMode
+type=simple
+#after edit update deamons sudo systemctl demon-reload
+
+
+
+#proccess debug
+ps aux - list proccesses
+ps 1 
+ps u 
+ps -U sk -list user prccess
+pgrep -a syslog 
+
+nice -n 10 bash
+ps fax
+
+sudo renice 7 8245
+
+kill -L -list of all kill command
+proccess to bg - crtl+z
+prccess fg 1
+if we need running in backup past "&"
+sleep 108 &
+jobs - list jobs
+ bg 1 - return to run in backhround
+#list opened files
+lsof -p <PID>
+sudo lsof /var/log/messages
+sudo kill -SIGHUP 959
+nice -n 15 bash
+
+sudo journalctl -p info -g '^c' > .priority/boot.log
+
+##Crontab
+you can add crontab to system
+for list  crontab -l
+we can add script to /etc/cron.hourly\dayly\etc
+#for adding
+sudo crontab -e
+30 21 * * * /usr/bin/touch test_passed
+#cronlogs
+cron logs /var/log/cron
+
+#for skip poweroff issue use anacron
+vi /etc/anacrontab
+#force run anacron
+sudo anacron -n -f
+we can add command at 15:00 
+or at Auugust 20 2022
+at 'now + 3 days'
+show scheduled
+ atq
+ at -c 20
+#remove jobs
+ atrm 20
+
+#Package managment
+dpkg --listfiles nginx # list all files
+dpkg --search /usr/sbin/nginx # list all files
+#find nginx
+apt search nginx # all matches including doc
+apt search --names-only nginx
+
+sudo apt remove ngnix
+sudo apt autoremove nginx
+
+#list repos
+/etc/apt/source.list
+deb - deb files
+url - repo address
+jammy - distro name
+main\uiveerse - repo maintainers
+
+#adding 3rd part repo 
+curl "https://download.docker...gpg" -o docker.key - download the key
+gpg --dearmor docker.key - transfer key to gpg format
+sudo mv docker.key.gpg /etc/apt/keyrings - copy to sign trusted 
+sudo vi /etc/apt/source.list.d/docker.list - add dedicated repo to source.list.d
+deb [signed-by=/etc/apt/keyrings/docker.key.gpg] https://download.docker.com/linux/ubuntu jammy stable
+sudo apt update
 
 
 # slect only uniqe strings in next line
@@ -349,5 +500,8 @@ sudo update-ca-certificates
 
 #for remove, remove file and
 sudo update-ca-certificates --fresh
+
+
+
 
 
