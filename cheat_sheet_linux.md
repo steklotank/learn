@@ -1,21 +1,21 @@
-##HOST Manipulating##
+## HOST Manipulating ##
 rename host
 hostnamectl set-hostname NAME
 
 
-##DOC Manipulatig##
+## DOC Manipulatig ##
 apropos - for search in all man pages
 apropos -s  1,8 director for search only in 1 and 8 sections
 sudo mandb - for upgrade apropos
 mandb - for refresh apropos
 man man (use number of section for particulary page)
 
-##SSH manipulating##
+## SSH manipulating ##
 copy ssh key to remote host with specific user
 ssh-copy-id -i ~/.ssh/id_rsa.pub 'user@domain'@10.0.1.1
 
 
-## File manipulating##
+## File manipulating ##
 Copy with permissions
 cp -p test.txt ./test_copy.txt
 create directory with parent directory 
@@ -30,7 +30,7 @@ HOW TO EOF in example.txt
 
 
 ## Permissions manipulating ##
-#Change group permisson to file
+# Change group permisson to file
 chgrp wheel exapmle.txt 
 #Change file user permission
 sudo chown sk example.txt
@@ -41,7 +41,7 @@ first check User > Groups > Other
 !if user doest have rights to manage file
 but hes group does, he will refused,
 because users right does not applyble 
-#Chmod base
+# Chmod base
 chmod  ugo(user\group other) +-(add or remove permission) rwx(read write execute) filname
 sudo chmod u+x,go-rwx
 or
@@ -85,7 +85,7 @@ find /lib64/ -size +10M
 -size 512k -search exact 512Kb
 -size +512k -searchs all grader than 512K
 -size -512k - search all less 512k
-#find operators
+## Find operators
 And operator
 find -size 10M -name "f*" # finds files size 10M and name starts with f
 Or operator 
@@ -120,7 +120,7 @@ find in local dir and copy to another
 find /home/bob/ -name "cats.txt" -exec cp "{}" /opt  \;
 
 
-##Command line manipulating##
+## Command line manipulating ##
 ctrl+r reverse search in history
 watch -n 5 date -run date every 5 seconds
 
@@ -137,7 +137,7 @@ git rebase master
 
 
 
-##Debugging tools##
+## Debugging tools ##
 top htop - for proccessing info
 itop - for disk usage
 
@@ -153,7 +153,7 @@ strace <command> - tracing syscall etc.
 ------------------------------------------------------------
 
 
-## Text manipulating##
+## Text manipulating ##
 get md5 hash of pass
  echo "p@ssword" | md5sum | cut -d' ' -f1
 
@@ -218,7 +218,7 @@ grep -ic '^SECTION' testfile > /home/bob/count_lines
  force grep to use regular re expression grep -Er
  or use egrep 
 
-#archiving data
+# Archiving data
 #baseline of archiving create tar > compress > send to storage
 list archve 
 tar --list --file archive.tar
@@ -247,7 +247,7 @@ tar caf archive.tar.gz dir1
 For extract
 tar --extract --file .. = tar xf archive.tar.gz /folder
 
-#Backing up
+# Backing up
           <local_dir>  <User@remoteaddr:/path/to/sync/>      
 rsync -a Pictures/     sk@192.1.1.1:home/sk/Pictures/
 
@@ -297,7 +297,7 @@ shudtown -r +15 'Sheduled restart after 15 minuets'
 cancel shutdown
 shutdown -c 
 
-#Booting 
+##  Booting 
 systemctl get-default
 #change target for non graphical
 sudo systemctl get-default multi-user.target  
@@ -308,7 +308,7 @@ sudo systemctl isolate emergency.target
 # rootshell
 sudo systemctl isolate rescue.target
 
-#Bootloader issue
+# Bootloader issue
 1)Load liveCD GRUB/
 2) procceed with /mnt/sysroot
 then chroot /mnt/susroot
@@ -323,10 +323,10 @@ grub2-install /dev/sda
 grub2-install /dev/vda > /home/bob/grub.txt 2>&1
 dnf reinstall grub2-efi grub-efi-modules shim
 
-#default grub config
+# default grub config
 /etc/default/grub 
 
-#Starting up linux
+## Starting up linux
 main proccess is init
 we have differen units such as services sockets devices and timers
 for example  systemctl cat containerd.service
@@ -361,14 +361,14 @@ sudo systemctl edit --full sshd.service
 
 sudo systemctl revert sshd.servic
 
-#managing service
+# managing service
 sudo systemctl status sshd.service
 sudo systemctl start sshd.service
 sudo systemctl stop sshd.service
 sudo systemctl restart  sshd.service
 sudo systemctl reload sshd.service
 
-#enabling\disabling services
+# enabling\disabling services
 sudo systemctl disable sshd.service
 sudo systemctl disable --now sshd.service
 sudo systemctl enable sshd.service
@@ -379,14 +379,14 @@ sudo systemctl unmask sshd.service
 
 sudo systemctl mask httpd.service
 
-#check service is enabled
+# check service is enabled
 systemctl is-enabled sshd.service
 
 
 list all avalable services
 systemctl list-units --type service --all
 
-#Create services
+## Create services
 we cat use as template sshd
 sudo cp /lib/systemd/system/ssh.service  /etc/systemd/system/myapp.service
 base line to fill
@@ -402,7 +402,7 @@ type=simple
 
 
 
-#proccess debug
+## Proccess debug
 ps aux - list proccesses
 ps 1 
 ps u 
@@ -429,7 +429,7 @@ nice -n 15 bash
 
 sudo journalctl -p info -g '^c' > .priority/boot.log
 
-##Crontab
+## Crontab
 you can add crontab to system
 for list  crontab -l
 we can add script to /etc/cron.hourly\dayly\etc
@@ -452,7 +452,7 @@ show scheduled
 #remove jobs
  atrm 20
 
-#Package managment
+## Package managment
 dpkg --listfiles nginx # list all files
 dpkg --search /usr/sbin/nginx # list all files
 #find nginx
@@ -476,15 +476,276 @@ sudo mv docker.key.gpg /etc/apt/keyrings - copy to sign trusted
 sudo vi /etc/apt/source.list.d/docker.list - add dedicated repo to source.list.d
 deb [signed-by=/etc/apt/keyrings/docker.key.gpg] https://download.docker.com/linux/ubuntu jammy stable
 sudo apt update
+ppa - personal package archive
+sudo add-apt-repository ppa:graphics-drivers/ppa
+#list repos
+add-apt-repository --list
+
+#compiling from source
+basics 
+download source repo
+add essentials utility
+run autocconfig to generate configfile
+ run ./configure
+ make for build 
+ make clean\install to clean or install
+
+## Resources
+df -h
+tmpfs - ingore
+pay atention to / path
+
+du -sh /bin/  s-summarize h-human readeble
+
+free -h --mega
+
+uptime 
+la - 1-5-15 min
+
+lscpu
+lspci
+
+#fix filesystem
+sudo xfs_repair -v /dev/vdb1
+sudo fsck.ext4 -v -f -p /dev/vdb2
+
+systemctl list-dependencies
+
+# Kernel Runtime Parameters
+sysctl -a -list kernel parameters
+net. vm.fs.kernel. related parameters
+
+#edit parameter on-run
+sudo systctl -w net.ipv6.conf.default.disable_ipv6=1
+
+man sysctl.d
+edit /ect/sysctl.d/*.conf
+sysctl -a | grep vm
+echo vm.swapniness=15 > /etc/sysctl.d/swap-less.conf
+sysctl -p /etc/sysctl.d/swap-less.conf
+#or  edit sysctl.conf
+sudo vi /etc/sysctl.conf
+sudo sysctl -p
+
+## SeLinux
+ls -Z
+ps axZ
+#change groups tags
+sudo chon
+#check status
+sestatus
+#set enforcement
+sudo  setenforce Permissive  
+#enable 
+/etc/selinux/config
+#identify role 
+ sudo semanage user -l
+MandatoryAccessConrol
+for ubuntu
+sudo systemctl stop apparmor.service
+sudo systemctl disable apparmor.service
+sudo apt instsall selinux-basics audtd
+sudo selinux-activate
+reboot 
+permissive \ enforcement
+sudo audit2why --all
+#for allow all that logged
+sudo audit2allow --all -M module_name
+sudo semodule -i module_name.pp
+#for setting enforcement
+sudo setenfoce 1
+less module_name.te
+#view tags users roles
+seinfo -u/r/t
+#set prop with refference
+sudo chcon --reference=/var/log/syslog/ /var/log/auth.log
+sudo restorecon -R /var/www
+more info
+https://docs.fedoraproject.org/en-US/quick-docs/selinux-getting-started/
+https://access.redhat.com/documentation/ru-ru/red_hat_enterprise_linux/8/html/using_selinux/index
+
+## User managment
+sudo useradd john -simplify add user
+sudo adduser jake - wide add with pass\prompnt
+ls -a /etc/skel - template for users
+ useradd --defaults -defaults parameters
+ /etc/login.defs - login defaultss
+
+## Add user with group an uid
+sudo useradd -G soccer sam  --uid 5322
+
+## Delete user with homedir
+sudo useerdel john
+sudo userdel --remove john = usderdel -r john
+
+id 
+whoami
+
+sudo usermod --home /home/otherdir --move-home john
+
+## edit primary group
+sudo usermod -g rugby sam
+## edit user dir login shell
+sudo usermod -d /home/otherdir -m john
+suod usermod --login jane john = usermod -l jane john
+sudo usermod -- shell /bin/zsh jane = usermod -s /bin/zsh jane
+
+## lock\unlock user
+sudo usermod -L sam
+sudo usermod --lock jane =  uleromd -L
+sudo usermod --unlock jane = jsermod -U
+
+## exp user
+usermod --expiredate 2025-12-1- jane = usemod -e
+YYYY-MM-DD
+usermod -e "" jane - delete exp
+
+## exp password
+chage --lastday 0 jane = chnge -d 0 jane
+chage --lastday -1 jane
+chage --maxdays(-M) 30 - for chage every 30 days
+chage --maxdays -1
+chage --list(-l) - for show pass exp date
+## add system accoutn
+sudo useradd -r apachedev
+sudo useradd --shell /bin/csh jack
+## warn user before 2 days exp
+sudo chage -W 2 jane
 
 
-# slect only uniqe strings in next line
+# Group managment
+
+Primary Group
+Login group
+groupadd developers
+## add to group
+gpasswd --add(-a) john developers
+groups john
+john: john developers
+      ^primary   ^ secondary groups
+
+## add group with gid
+sudo groupadd --gid 9875 cricket
+
+usemod --(gid)-g developers john - change primary group
+## rename group
+groupmod --new-name(-n) programmers developers
+
+## delete group
+groupdel progremmers - doesn't delete if tis primary group
+
+# Envs
+
+printenv = env
+```
+$HOME
+```
+cat .bashrc
+## add env to erveybody
+vi /etc/enviroment
+```
+## Script for every user
+vi /etc/profile.d/lastlogin.sh
+echo "Your last login was at: " > $HOME/lastlogin
+date >> $HOME/lastlogin
+```
+## Default files for new user
+vi  /etc/skel/README > please be cool
+
+sudo vi /home/trinity/.bashrc > add some scripts
+
+export ENV_NAME=Value
+
+## add new env from default file
+source /etc/environment
+
+# User limints
+
+vi /etc/security/limits.conf
+domain - username\@group\*
+type - hard\soft\-    hard - max value soft - initial  - both
+item - nproc(number of procceese)\fsize(kb)\cpu(in sec)
+man limits.conf
+
+ulimint -a
+
+# User privileges
+groups
+## add to sudo 
+sudo gpasswd -a trinity wheel
+## remove form sudo 
+sudo gpasswd -d trinity wheel
+
+sudo visudo 
+%wheel      ALL=(ALL)       ALL
+^group\user ^host ^as sudo  ^list of command
+trinity  ALL=(ALL) ALL
+## allow no passwrd
+trinity    ALL=(ALL)   NOPASSWD: ALL
+![visudo](image-1.png)
+
+# Root managing
+## login as root
+sudo --login
+# for exact root user
+su  -
+# set root pass
+sudo passwd root
+# unlock root
+sudo passwd  -u root
+# lock root passwd
+sudo passwd --lock root
+
+# PAM
+plugable authantifacatuation modules
+/etc/pam.d/
+man pam.conf
+man pam <tab> for list modues
+deny root to use ssh
+auth    required       pam_listfile.so onerr=succeed  item=user  sense=deny  file=/etc/ssh/deniedusers
+echo root > /etc/ssh/deniedusers
+
+# LDAP
+///
+
+
+# Networking
+## IPv4
+![bits ipv4](image-2.png)
+![CIDR](image-3.png)
+![mask explanation](image-4.png)
+![mask example 2](image-5.png)
+## IPv6
+![example](image-7.png)
+![short address](image-8.png)
+![CIDR](image-9.png)
+![shord CIDR](image-10.png)
+## show configuring
+ip link - show interfaces
+lo - local
+enp0s3 - physical devive
+ip -c addr
+## enabling interfaces
+sudo ip link set dev enp0s8 up
+## assign ip addreses
+sudo ip address add 192.168.5.55/24 dev enp0s8
+sudo ip address delete 192.168.5.55/24 dev enp0s8
+## ubuntu assign ip
+netplan get
+ls /etc/netplan/ - yaml file
+![addreses netplan](image-12.png)
+
+
+
+
+# Soring
+## slect only uniqe strings in next line
 uniq filname.txt 
 
-#sorting 
+## sorting 
 sort filename.txt
 
-#for select only uniqe enteries we need to pass 
+## for select only uniqe enteries we need to pass 
 sort filname.txt | qniq
 
 
@@ -493,15 +754,17 @@ diff -c file1 file2 # for show diff with context
 sdiff file1 file2 # for side by side diff
 
 
-##Add Trusted certificate
-#Debian
+# Add Trusted certificate
+# Debian
 sudo cp your.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 
-#for remove, remove file and
+# for remove, remove file and
 sudo update-ca-certificates --fresh
 
-
+# JQ
+move all uniq thead_name from json
+jq .thread_name ../logs_isys_coin.json | sort| uniq > ../thread_name_coin.json
 
 
 
