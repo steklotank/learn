@@ -14,6 +14,17 @@ man man (use number of section for particulary page)
 copy ssh key to remote host with specific user
 ssh-copy-id -i ~/.ssh/id_rsa.pub 'user@domain'@10.0.1.1
 
+configuring ssh deamon
+
+aslo can use ~/.ssh_config
+for use ssh centos
+![alt text](image-59.png)
+
+for adding custom port use custom config
+![alt text](image-60.png)
+
+/etc/ssh/sshd_config
+diff ssh port\password auth\protocol\Listen address\permit root login
 
 ## File manipulating ##
 Copy with permissions
@@ -734,11 +745,317 @@ sudo ip address delete 192.168.5.55/24 dev enp0s8
 netplan get
 ls /etc/netplan/ - yaml file
 ![addreses netplan](image-12.png)
+sudo netplan apply 
+## for temporary apply 
+sudo netplan try --timeout 30
+netplan get
+## expand settings
+![adding rout and DNS](image-14.png)
+## show routes and dns Configure default DNS
+ip route
+resolvectl status
+vi /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved.service
+## netplan examples
+/usr/share/doc/netplan/examples
+## apply netplan
+sudo chmod 600 /etc/netplan/99-custom.yaml
+sudo netplan apply
 
 
 
 
-# Soring
+# Managing network services
+
+## Checkig network services
+ss\netstat
+sudo ss  -ltupn 
+![alt text](image-15.png)
+
+0.0.0.0 - listen connection of any ip
+[::] -same for ipv6
+sudo netstat -tulpn | grep LISTEN > /home/bob/incoming.txt
+
+
+# Bridge & bounding
+## bridge config
+![bridge concept](image-17.png)
+cat /usr/share/doc/netplan/examples/bridge.yaml
+connect enp0s9 and s10
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s9:
+      dhcp4: no
+    enp0s10
+      dhcp4: no
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+        - enp0s9
+        - enp0s10
+
+## delete bridge 
+suod ip link delete br0
+rm /etc/netplan/99-bridge.yml
+## bounding
+![bonding](image-16.png)
+bounding like raid for network card
+it round robin connection and work as failover
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s9:
+      dhcp4: no
+    enp0s10:
+      dhcp4: no 
+  bonds:
+    bond0:
+      dhcp4: yes
+      interfaces:
+        - enp0s9
+        - enp0s10
+      parameters:
+        mode: active-backup # here we can chose mode, more here- man netplan 
+        primary: enp0s9
+
+sudo netplan apply 
+
+# Firewall  Packet filtering
+## add 22 to ufw
+sudo ufw status
+sudo ufw allow 22
+sudo ufw enable
+## allow traffic from CIDR to 22
+sudo ufw allow from 192.168.1.0/24 to any port 22 
+
+## delete 1st created rule
+sudo ufw status numbered
+sudo ufw delete 1  # for deleting 1st rule 
+or
+sudo ufw delete allow 22
+## allow all connections from CIDR
+sudo ufw allow from 10.0.0.0/24
+
+## Deny from spec ip
+sudo ufw deny from 10.0.0.100
+but this rule is below
+so proper command will be:
+sudo ufw insert 3 deny  from 10.0.0.100 
+
+## Deny outgoing traffic
+sudo ufw dny out on enp0s3 to 8.8.8.8
+## Allowing port serving for ip
+sudo ufw allow in on enp0s3 from 192.168.1.60 to 192.168.1.81 port 80 proto tcp
+sudo ufw allow in on enp0s3 from 192.168.1.81 to 192.168.1.60 port 80 proto tcp
+
+# Port redirection NAT
+
+![prot redirection](image-18.png)
+
+![packet internals](image-19.png)
+
+to configure redirection 1st we need to enable prot forwarding
+
+![enable port redirection](image-20.png)
+
+![uncomment forwarding](image-21.png)
+
+sudo sysctl --system
+check 
+sudo sysctl -a | grep forward
+
+kernel works with network throw netfilter framework nft
+we can use more simple iptables
+
+## Adding prerouting rule
+![package proccessing chain](image-23.png)
+
+![command](image-24.png)
+
+![explanation](image-25.png)
+![explanation pt2](image-26.png)
+![explanation pt3](image-27.png)
+![result scheme](image-28.png)
+## add postrouting
+![command](image-29.png)
+![explanation](image-30.png)
+![explanantion pt2](image-31.png)
+
+nft rules
+![list of nft rule](image-32.png)
+## add routes persisten
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+
+![2 rules for masqarading](image-33.png)
+
+for help run
+man ufw-framework
+![u can modify rule](image-34.png)
+![modify outgoing](image-35.png)
+## list iptables rules and flush
+sudo iptables --list-rules --table nat
+sudo iptables --flush --table nat
+
+# Reverse proxy and LB
+
+reverse proxies
+nginx, HAproxy, apache, traefik, squid
+
+## Creating nginx proxy
+![install](image-36.png)
+
+cat /etc/nginx/proxy_params
+
+## creating nginx LB
+![load balancing](image-37.png)
+![least con](image-38.png)
+![weight](image-39.png)
+![maintenence mode](image-40.png)
+![backup server](image-41.png)
+![crating LB](image-42.png)
+
+# NTP
+timedatectl
+sudo timedatectl set-timezone America/New_York
+sudo apt install systemd-timesyncd
+vi  /etc/systemd/timesyncd.conf
+uncomment NTP
+![alt text](image-43.png)
+![alt text](image-44.png)
+
+# DNS caching
+for caching we can use bind utility
+![alt text](image-47.png)
+enabling caching
+![alt text](image-48.png)
+## configuring bind
+![alt text](image-49.png)
+add  master to bind 
+![alt text](image-50.png)
+copy sample zone
+![alt text](image-51.png)
+SOA -start of authority
+IN -internet
+@ - reffers to current domain
+![alt text](image-53.png)
+for apply changes restart nameservice
+![alt text](image-54.png)
+for check dig @localhost example.com
+dig @localhost -q example.com ANY
+
+# Emailing
+configuring email server
+![alt text](image-55.png)
+configuring aliases
+![alt text](image-56.png)
+path to config IMAP
+![alt text](image-57.png)
+list  configs
+![alt text](image-58.png)
+sudo dnf install postfix mailx -y
+sudo systemctl start postfix
+
+# Virtualization
+sudo dnf install libvitrt quemu-kvm
+vim testmachne.xml
+![alt text](image-62.png)
+virsh define testmachne.xml 
+![alt text](image-63.png)
+
+# Disk managment
+
+## listing device and partitions
+lsblk -list  block device
+sudo fdisk --list /dev/mmcblk0 -list partition
+sudo cfdisk /dev/sdb -partition managment
+
+### managindg partitions
+Follow below given steps:
+sudo fdisk /dev/vdb
+Now enter below given responses:
+Command (m for help): n
+Select (default p):  <just-leave-it-default-and-press-enter>
+Partition number (1-4, default 1): <just-leave-it-default-and-press-enter>
+First sector (2048-2097151, default 2048):  <just-leave-it-default-and-press-enter>
+Last sector, +sectors or +size{K,M,G,T,P} (2048-2097151, default 2097151): +10M
+Command (m for help): w
+
+for delete partition
+Command (m for help): d
+Partition number (1-3, default 3): 1
+
+
+## managing swap
+swapon --show
+sudo mkswap /dev/vdb3
+
+### create and enable
+sudo mkswap /dev/vdb2
+sudo swapon /dev/vdb2
+
+### increasing swap
+Increase the existing swap (i.e /swapfile) size by 1GB.
+Execute below given command:
+sudo dd if=/dev/zero of=/swapfile bs=1M count=1024 oflag=append conv=notrunc
+In this command /swapfile is the swap file you are going to edit and count=1024 is the exact increase in size.
+Disable the swap file:
+sudo swapoff /swapfile
+Setup the file as a swap file again.
+sudo mkswap /swapfile
+Enable again swaping:
+sudo swapon /swapfile
+
+
+# Creating filesystem
+
+## managing fs
+sudo mkfs.ext4 /dev/sdb1
+sudo mkfs.ext4 -N 2048 /dev/vdc
+change lable
+sudo xfs_admin -L "SwapFS" /dev/vdb
+
+sudo tune2fs -l /dev/sdb2
+
+## mount
+sudo mount /dev/vdb1 /mnt/
+sudo umount /mnt/
+
+persistent mount
+sudo vi /etc/fstab
+for automount
+![alt text](image-64.png)
+We can use uuid
+![alt text](image-65.png)
+create swap
+echo "/dev/vdb none swap defaults 0 0" >> /etc/fstab
+
+## on Demand mounting
+use autofs
+![alt text](image-66.png)
+create nfs
+![alt text](image-67.png)
+create mounting points for nfs
+![alt text](image-68.png)
+mount autofs
+![alt text](image-69.png)
+![alt text](image-73.png)
+
+sudo systemctl reload autofs
+
+listing filesysytem
+findmnt -t xfs,ext4
+## mount rear only fs
+sudo mount -o ro /dev/vdb/ /mnt
+![alt text](image-74.png)
+
+## mounting nfs
+![alt text](image-75.png)
+
 ## slect only uniqe strings in next line
 uniq filname.txt 
 
