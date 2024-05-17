@@ -311,7 +311,7 @@ shutdown -c
 ##  Booting 
 systemctl get-default
 #change target for non graphical
-sudo systemctl get-default multi-user.target  
+sudo systemctl set-default multi-user.target  
 # for backing graphical
 sudo systemctl isolate graphical.target
 # emergency
@@ -1055,6 +1055,12 @@ sudo mount -o ro /dev/vdb/ /mnt
 
 ## mounting nfs
 ![alt text](image-75.png)
+
+# Getting disk usage statistics
+sudo apt install sysstat
+iostat
+![alt text](image-76.png)
+
 
 ## slect only uniqe strings in next line
 uniq filname.txt 
