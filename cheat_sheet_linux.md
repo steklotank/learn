@@ -1060,6 +1060,96 @@ sudo mount -o ro /dev/vdb/ /mnt
 sudo apt install sysstat
 iostat
 ![alt text](image-76.png)
+![alt text](image-77.png)
+-h - human output
+
+pdstat -d 1
+
+# Confuguring LVM
+sudo apt install lvm2
+
+ sudo lvmdiskscan
+![alt text](image-78.png)
+
+sudo pvs
+sudo vgcreate my_volumve /dev/sdc /dev/sdb
+sudo pvcreate /dev/sde
+sudo vgcreate volume1 /dev/vdb /dev/vdc
+sudo vgextend my_volume /dev/sde
+sudo vgs 
+### fpr remove 
+sudo vgreduce my_volume /dev/sde
+sudo pvremove /dev/sde
+
+sudo lvcreate --size 2G --name partition1 my_volume 
+sudo lvcreate --size 6G --name partition2 my_volume 
+sudo lvs
+###  extend
+sudo lvresize --extents 100%VG my_volume/partition1
+resize back 
+sudo lvresize --size 2G my_volume/partition1
+sudo lvdisplay
+sudo vgs
+remove 
+sudo lvremove volume1/smalldata
+
+
+create fs
+sudo mkfs.xfs /dev/my_volume/partition1
+
+for resize lvm with fs
+sudo lvresize --resizefs --size 3G my_volume/partition1
+
+# Encrypted storage
+sudo cryptsetup --veryfy-passphrase open --type plan /dev/vde mysecuredisk
+
+sudo cryptsetup open --type plain /dev/vde secretdisk
+
+sudo mkfs.xfs /dev/mapper/mysecuredisk
+
+sudo mount /dev/mapper/mysecuredisk /mnt
+
+sudo umount /mnt
+
+sudo cryptsetup close mysecuredisk
+
+## Create luks 
+sudo cryptsetup luksFormat /dev/vde
+open it
+sudo cryptsetup open /dev/vde secretdisk
+
+
+## Creating an array 
+![alt text](image-79.png)
+### see status
+cat /proc/mdstat
+### remove device from array
+sudo mdadm --manage /dev/md0 --remove /dev/vde
+
+## Using ACL
+![alt text](image-80.png)
+ls -l - for list acl files (+)
+getfacl examplefile - for getting ACL
+remove acl
+sudo setfacl --remove user:john specialfile
+sudo setfacl --modify group:mail:rx specialfile
+setfacl --recursive --modify user:john:rwx collection/
+remove acl
+sudo chattr -i specialfile
+
+
+## quoting 
+sudo dnf install quota 
+sudo vim /etc/fstab
+sudo sysemctl reboot
+
+/etc/fstab
+![alt text](image-82.png)
+sudo xfs_quota -x -c 'limit bsoft=100m bhard=500m john' /mnt/
+
+
+
+![alt text](image-81.png)
 
 
 ## slect only uniqe strings in next line
