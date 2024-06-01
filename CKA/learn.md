@@ -1,3 +1,4 @@
+
 # Kubernetes comonents
 
 
@@ -11,8 +12,31 @@ Control plain (various controller for ex. replica  controller) - controller of p
 Scheduler - planning the workload on nodes
 
 
+### Tweaks
+
 Kubelet - run the container
 Kubeproxy - run network rules for contaners
+krew
+ktx
+kns
+
+
+create manifests
+pod deployment
+kubectl run nginx --image=nginx --dry-run=client -o yaml
+kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+service
+kubectl create service clusterip redis --tcp=6379:6379 --dry-run=client -o yaml
+kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
+kubectl expose pod nginx --type=NodePort --port=80 --name=nginx-service --dry-run=client -o yaml
+kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run=client -o yaml
+
+
+kubectl run custom-nginx --image=nginx
+kubectl expose pod custom-nginx --port=8080
+kubectl create deployment  --image=kodekloud/webapp-color webapp --replicas=3 --dry-run=client -o yaml
+
+
 
 ### Kubernetes debugging tools
 
@@ -185,3 +209,140 @@ quoting
 create pod in a namespace k run --image=redis redis -n finance
 
 kubectl get pods --all-namespaces
+
+
+## Scheduling
+ 
+scheduling is apply pod to node, after that in specs we see asigned node
+sceduling can be done manually only(!) when created
+after that we can bind it trhoug -bind-definition.yaml 
+![alt text](image-21.png)
+
+### lables and selectors
+
+we apply labels to each pod
+Labeling
+![alt text](image-22.png)
+![alt text](image-23.png)
+
+Selecting
+![alt text](image-24.png)
+![alt text](image-25.png)
+
+example of selector
+kubectl get pods --selector env=dev,tier=frontend --no-headers | wc -l
+
+### Taints and toleration
+
+taint - for not scheduling pods on nodes
+toleration - for scheduling pod on particular node
+![alt text](image-27.png)
+
+![alt text](image-28.png)
+
+maser nodes in cluster have taint:No scheduling
+
+kubectl taint nodes node1 key1=value1:NoSchedule-
+k taint nodes node01 spray-mirtein:NoSchedule
+for fix
+k taint nodes node01 spray=mortein:NoSchedule --overwrite
+
+for remove 
+k tanit node controlplane node-role.kubernetes.io/master:NoSchedule-
+
+### Node Selector
+
+basicly for chose the best nodes with resources.
+
+nodeSelector:
+    size: Large
+kubectl lable nodes <node-name> <label-key>=<label-value>
+we can't apply rule like not small  or large or small. For this porpouse we use Node Affinity
+
+### Node Affinity
+in a list we can past few nodes
+![alt text](image-31.png)
+
+Not small
+![alt text](image-30.png)
+
+Node Affinity Types
+![alt text](image-32.png)
+
+### Resource limits
+
+pod definition
+![alt text](image-33.png)
+
+exceeding limits
+![alt text](image-34.png)
+
+CPU limits behavior
+![alt text](image-35.png)
+
+Memory limits behavior
+![alt text](image-36.png)
+
+limitRange
+for all containers without limits
+![alt text](image-37.png)
+
+Namespace ResourceQuotas
+![alt text](image-38.png)
+
+    resources:
+      requests:
+        memory: "20Mi"
+      limits:
+        memory: "20Mi"
+k describe po example
+
+if pod was oom killed it will be at section
+
+Last State:
+    Reaseon:
+
+if we whant to edit we can make kuebectl edit po <pod_name>
+and then 
+![alt text](image-39.png)
+
+### DeamonSets
+making 1 pod on each node
+![alt text](image-40.png)
+
+![alt text](image-41.png)
+ kubectl get daemonsets --all-namespaces
+
+### Static Pod
+![alt text](image-42.png)
+Use Case 
+![alt text](image-43.png)
+all static pods have name of node on the end 
+
+also owner of pod is Node 
+![alt text](image-44.png)
+
+run from cli 
+kubectl run --restart=Never --image=busybox:1.28.4 static-busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-busybox.yaml
+systemctl restart kubelet
+
+kubelet configs /var/lib/kubelet/config.yaml
+
+### Mulitble scheduler
+additional scheduler 
+
+![alt text](image-45.png)
+
+view Events of scheduling
+kubectl get events -o wide
+kubectl logs my-custom-scheduler --name-space=kube-system
+
+Scheduling proccess
+pod>  scheduling Queue > filtering         >        scoring          >       bindign
+      prioritySort        NodeResoourcesFit           NodeResourcesFit        DefaultBinder
+                          NodeName                    ImageLocality
+                          NodeUnscheduleble       
+
+![alt text](image-47.png)
+
+![alt text](image-48.png)
