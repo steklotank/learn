@@ -346,3 +346,255 @@ pod>  scheduling Queue > filtering         >        scoring          >       bin
 ![alt text](image-47.png)
 
 ![alt text](image-48.png)
+
+## Monitoring
+
+Default in-memory monitoring solution is
+metrics-server
+install
+![alt text](image-49.png)
+view 
+![alt text](image-50.png)
+
+kubectl logs pod_name
+
+## Kuberntes apps lifecycle
+basicly via deployment
+recreate and rolling update
+through deployment strategy
+StrategyType:           RollingUpdate\Recreate
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+![alt text](image-51.png)
+
+Rollback
+![alt text](image-52.png)
+
+pass command to container via CMD
+![alt text](image-53.png)
+
+Enrypoint 
+![alt text](image-54.png)
+![alt text](image-55.png)
+overwrite entrypoint
+![alt text](image-56.png)
+ 
+ pass comands to pod
+ ![alt text](image-57.png)
+ overwirte entrypoint in pod
+ ![alt text](image-58.png)
+   
+also we can write down like this
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: ubuntu-sleeper-3
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+      - "sleep"
+      - "1200"
+![alt text](image-59.png)
+kubectl delete pod NAME --grace-period=0 --force  
+
+replace 
+k replace --force -f /tmp/kubectl-edit-2342526.yaml
+
+### ENV
+it's an array
+![alt text](image-60.png)
+get env from CM or secret
+![alt text](image-62.png)
+
+### Configmap
+create Cm
+
+imperative
+![alt text](image-65.png)
+declarative 
+![alt text](image-66.png)
+inject in podW
+![alt text](image-67.png)
+Data: APP_COLOR=darkblue
+
+Data: APP_OTHER=disregard
+
+kubectl create configmap \
+ webapp-config-map --from-literal=APP_COLOR=darkblue \
+--from-literal=APP_OTHER=disregard
+
+### Sercets
+
+create secret imperative
+![alt text](image-69.png)
+
+create secret declarative
+![alt text](image-70.png)
+
+secrets in declarative must be encoded
+![alt text](image-71.png)
+
+View secrets
+![alt text](image-72.png)
+
+Injectintg secrets
+![alt text](image-73.png)
+
+Secrets are not encrypted!!!
+![alt text](image-74.png)
+
+Ecrypting API
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+to check we need too check kube-apiserver prop
+ --encryption-provider-config
+
+### Multicontainer
+
+'''example of logging app
+ ---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+  namespace: elastic-stack
+  labels:
+    name: app
+spec:
+  containers:
+  - name: app
+    image: kodekloud/event-simulator
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: DirectoryOrCreate'''
+patterns init container ambassador adapter init-container
+
+## Maintaining cluster
+
+### System upgrade
+
+#### for safetly shutdown pod
+1st kubectl drain node-1
+2nd kubectl uncordon node-1
+kubectl drain node01 --ignore-daemonsets
+
+
+#### unschedule node
+kubectl cordon node-2
+
+versions of kubernetes
+![alt text](image-75.png)
+![alt text](image-77.png)
+
+supported version and upgrading
+![alt text](image-79.png)
+
+firstly upgrading a master node
+than we can ho three ways:
+1 - Upgrade all worker nodes at once
+2 - Upgrade one node at time
+3 - add to cluster new nodes with new version (cloud)
+
+#### upgradeing kubeadm
+
+worker upgrade 
+![alt text](image-80.png)
+master upgrade
+![alt text](image-81.png)
+![alt text](image-82.png)
+
+general plan from 28 to 29
+
+https://v1-29.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+
+edit repo to 29
+https://v1-29.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/change-package-repository/
+
+nano /etc/apt/sources.list.d/kubernetes.list
+set 29
+then 
+sudo apt update
+sudo apt-cache madison kubeadm
+
+ugrade kubeadm
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.29.0-1.1' && \
+sudo apt-mark hold kubeadm
+
+Verify that the download works and has the expected version:
+
+kubeadm version
+Verify the upgrade plan:
+
+sudo kubeadm upgrade plan
+
+update kubelet
+ apt-get install kubelet=1.29.0-1.1
+ systemctl daemon-reload
+ systemctl restart kubelet
+
+ #### Backing up
+
+ We can backub through VELERO for resources
+
+ ETCD
+befor execute set API version
+export ETCDCTL_API=3
+
+
+ ![alt text](image-83.png)
+
+ take snap
+ ![alt text](image-84.png)
+
+
+ restore (need to create new cluster)
+ ![alt text](image-85.png)
+
+Since our ETCD database is TLS-Enabled, the following options are mandatory:
+
+–cacert verify certificates of TLS-enabled secure servers using this CA bundle
+
+–cert  identify secure client using this TLS certificate file
+
+–endpoints=[127.0.0.1:2379] This is the default as ETCD is running on master node and exposed on localhost 2379.
+
+–key  identify secure client using this TLS key file
+
+take snap
+ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 \
+--cacert=/etc/kubernetes/pki/etcd/ca.crt \
+--cert=/etc/kubernetes/pki/etcd/server.crt \
+--key=/etc/kubernetes/pki/etcd/server.key \
+snapshot save /opt/snapshot-pre-boot.db
+
+restore
+ETCDCTL_API=3 etcdctl  --data-dir /var/lib/etcd-from-backup \
+snapshot restore /opt/snapshot-pre-boot.db
+
+for restoring go to etcd.yaml manifest
+/etc/kubernetes/manifests/etcd.yaml
+find 
+  volumes:
+  - hostPath:
+      path: /var/lib/etcd
+      type: DirectoryOrCreate
+    name: etcd-data
+
+and type etcd-from-backup
+!!!! section etcd-data!!
